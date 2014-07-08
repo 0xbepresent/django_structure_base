@@ -16,8 +16,13 @@ Quickstart
 ----------
 
     $ virtualenv env_{{project_name}}
+    
     $ source env_{{project_name}}/bin/activate
+    
     $ cd /path/to/{{project_name}}/
+    
     $ pip install -r requirements.txt
+    
     $ cp settings/local.py.example settings/local.py
+    
     $ python manage.py runserver 8001
