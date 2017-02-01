@@ -3,13 +3,14 @@ Django Base settings for {{project_name}} project.
 
 Shared by all environments
 """
+import os
+
+# Build paths inside the project like this: os.path.join(BASE_DIR, ...)
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+PROJECT_ROOT = os.path.dirname(os.path.abspath(__file__))
+
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = '{{secret_key}}'
-
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
-
-TEMPLATE_DEBUG = True
 
 ALLOWED_HOSTS = []
 
@@ -24,6 +25,18 @@ INSTALLED_APPS = (
     'django.contrib.staticfiles',
 )
 
+MIDDLEWARE_CLASSES = [
+    'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
+    'django.contrib.sessions.middleware.SessionMiddleware',
+    'django.middleware.common.CommonMiddleware',
+    'django.middleware.csrf.CsrfViewMiddleware',
+    'django.contrib.auth.middleware.AuthenticationMiddleware',
+    'django.contrib.auth.middleware.SessionAuthenticationMiddleware',
+    'django.contrib.messages.middleware.MessageMiddleware',
+    'django.middleware.clickjacking.XFrameOptionsMiddleware',
+]
+
 # Internationalization
 # https://docs.djangoproject.com/en/1.6/topics/i18n/
 
@@ -37,35 +50,40 @@ USE_L10N = True
 
 USE_TZ = True
 
-#==============================================================================
-# Calculation of directories relative to the project module location
-#==============================================================================
+ROOT_URLCONF = 'urls'
 
-# Build paths inside the project like this: os.path.join(BASE_DIR, ...)
-import os
-BASE_DIR = os.path.dirname(os.path.dirname(__file__))
-
-#==============================================================================
-# URLS and media settings
-#==============================================================================
-
-ROOT_URLCONF = 'apps.urls'
+TEMPLATES = [
+    {
+        'BACKEND': 'django.template.backends.django.DjangoTemplates',
+        'DIRS': [],
+        'APP_DIRS': True,
+        'OPTIONS': {
+            'context_processors': [
+                'django.template.context_processors.debug',
+                'django.template.context_processors.request',
+                'django.contrib.auth.context_processors.auth',
+                'django.contrib.messages.context_processors.messages',
+            ],
+        },
+    },
+]
 
 # WSGI_APPLICATION = 'wsgi.application'
 
+STATIC_ROOT = os.path.join(PROJECT_ROOT, 'staticfiles')
 STATIC_URL = '/static/'
-STATIC_ROOT = '%s/static/' % BASE_DIR
 
+# Extra places for collectstatic to find static files.
+STATICFILES_DIRS = [
+    os.path.join(PROJECT_ROOT, 'static'),
+]
 
-#==============================================================================
-# Middleware
-#==============================================================================
-
-MIDDLEWARE_CLASSES = (
-    'django.contrib.sessions.middleware.SessionMiddleware',
-    'django.middleware.common.CommonMiddleware',
-    'django.middleware.csrf.CsrfViewMiddleware',
-    'django.contrib.auth.middleware.AuthenticationMiddleware',
-    'django.contrib.messages.middleware.MessageMiddleware',
-    'django.middleware.clickjacking.XFrameOptionsMiddleware',
-)
+# Import configurations. Production, Development or Testdeploy.
+if os.path.exists('{}/settings/prod.py'.format(BASE_DIR)):
+    from .prod import *  # noqa
+elif os.path.exists('{}/settings/stage.py'.format(BASE_DIR)):
+    from .stage import *  # noqa
+elif os.path.exists('{}/settings/dev.py'.format(BASE_DIR)):
+    from .dev import *  # noqa
+else:
+    raise ImportError("The is not configuration")

@@ -6,10 +6,7 @@ it to settings/local.py. It should not be checked into
 your code repository.
 
 """
-from settings.base import *   # pylint: disable=W0614,W0401
-
 DEBUG = True
-TEMPLATE_DEBUG = DEBUG
 
 ADMINS = (
     ('You', 'your@email'),
